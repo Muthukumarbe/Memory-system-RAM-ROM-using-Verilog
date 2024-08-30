@@ -1,0 +1,43 @@
+`timescale 1ns / 1ps
+
+module memory2(
+    input wire clk,
+    input wire rst,
+    input wire [7:0] address,
+    input wire [7:0] data_in,
+    input wire we,
+    output reg [7:0] data_out
+    );
+	parameter ROM_SIZE = 128;
+	parameter RAM_SIZE = 128;
+	parameter MEM_SIZE = ROM_SIZE+RAM_SIZE;
+
+	reg [7:0] ROM [0:ROM_SIZE-1];
+	reg [7:0] RAM [0:RAM_SIZE-1];
+	
+	genvar i;
+	
+	generate
+		for(i=0;i<ROM_SIZE;i=i+1)begin : ROM_INIT
+			initial ROM[i]=8'h00;
+		end
+	endgenerate
+	integer j;
+	always@(posedge clk or posedge rst)begin
+		if(rst)begin
+			for(j=0;j<RAM_SIZE;j=j+1)begin
+				RAM[j]<=8'h00;
+			end
+		end else if(we&&(address>=ROM_SIZE))begin
+			RAM[address-ROM_SIZE]<=data_in;
+		end
+	end
+	
+	always@(address)begin
+		if(address < ROM_SIZE)begin
+			data_out=ROM[address];
+		end else begin
+			data_out=RAM[address-ROM_SIZE];
+		end
+	end
+endmodule
