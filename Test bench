@@ -1,0 +1,74 @@
+module testbench;
+
+	// Inputs
+	reg clk;
+	reg rst;
+	reg [7:0] address;
+	reg [7:0] data_in;
+	reg we;
+
+	// Outputs
+	wire [7:0] data_out;
+
+	// Instantiate the Unit Under Test (UUT)
+	memory2 uut (
+		.clk(clk), 
+		.rst(rst), 
+		.address(address), 
+		.data_in(data_in), 
+		.we(we), 
+		.data_out(data_out)
+	);
+
+	initial begin
+		clk = 0;
+		forever #5 clk=~clk;
+	end
+	initial begin
+		rst = 1;
+		address = 8'd0;
+		data_in = 8'd0;
+		we = 0;
+
+		#20;
+		rst=0;
+		
+		address = 8'd0;
+		#10;
+		address = 8'd1;
+		#10;
+		address = 8'd2;
+		#10;
+		address = 8'd127;
+		#10;
+      
+		address = 8'd128;
+		data_in = 8'h55;
+		we=1;
+		#10;
+		we=0;
+		
+		address = 8'd129;
+		data_in = 8'hAA;
+		we=1;
+		#10;
+		we=0;
+		
+		address = 8'd130;
+		data_in = 8'hFF;
+		we=1;
+		#10;
+		we=0;		
+		
+		address = 8'd128;
+		#10;
+		address = 8'd129;
+		#10;
+		address = 8'd130;
+		#10;
+		$stop;
+
+	end
+      
+endmodule
+
